@@ -1,0 +1,72 @@
+<?php
+
+namespace App\DataTables\$MODEL_NAME$;
+
+use App\Http\Resources\$MODEL_NAME$Resource;
+use App\Models\$MODEL_NAME$;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use MikhailMouner\Datatable\Container\DataTables;
+
+class $MODEL_NAME$Datatable extends DataTables
+{
+    protected $MODEL_NAME$ $model;
+    protected array $selectedColumns = ["*"];
+    protected array $orderColumns = ["id"];
+    protected array $searchColumns = [];
+
+    public function __construct(Request $request, $MODEL_NAME$ $model)
+    {
+        parent::__construct($request);
+        $this->model = $model;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getTotalRecords()
+    {
+        $query = $this->model::distinct()->select(DB::raw('count(*) as rows_count'));
+        $this->handleSearchQuery($query);
+        $this->handleCustomQuery($query);
+        return $query->first()->rows_count;
+    }
+
+
+    protected function handleCustomQuery($query)
+    {
+        return $query;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    protected function getRecordsData()
+    {
+        $query = $this->model::distinct()->orderBy($this->getOrderColumnName(), $this->getOrderType())
+            ->select($this->selectedColumns)
+            ->skip($this->getStart())
+            ->take($this->getPageLength())
+            ->orderBy($this->getOrderColumnName(), $this->getOrderType());
+        $this->handleSearchQuery($query);
+        $this->handleCustomQuery($query);
+        return $query->get();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getAllData(): JsonResponse
+    {
+        $totalRecords = $this->getTotalRecords();
+        $recordsData = $this->getRecordsData();
+        return response()->json([
+            "draw" => $this->getDraw(),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecords,
+            "aaData" => $MODEL_NAME$Resource::collection($recordsData)
+        ]);
+    }
+}
