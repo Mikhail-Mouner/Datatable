@@ -1,0 +1,28 @@
+{
+    "name": "mikhail-mouner/datatable",
+    "description": "This package is a useful tool to generate datatable files",
+    "minimum-stability": "stable",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MikhailMouner\\Datatable\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mikhail-Mouner",
+            "email": "mikhaeelmouner@yahoo.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MikhailMouner\\Datatable\\DattableProvider"
+            ]
+        }
+    }
+}
